@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Seleção de imagens</title>
+</head>
+<body>
+    <h1>Seleção de imagens</h1>
+
+    <form method="POST" enctype="multipart/form-data">
+        <input type="file" id="image-input">
+        <input type="submit" value="Enviar" onclick="convertAndSubmit(event)">
+    </form>
+
+    <script>
+        function convertAndSubmit(event) {
+            event.preventDefault(); // Evita o envio normal do formulário
+
+            const fileInput = document.getElementById('image-input');
+            const file = fileInput.files[0];
+
+            const reader = new FileReader();
+            reader.onloadend = function() {
+                const base64String = reader.result.split(',')[1];
+
+                const imageObject = { image: base64String };
+
+                fetch('/upload', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(imageObject)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    // Faça algo com a resposta da API, se necessário
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    // Trate o erro, se necessário
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+    </script>
+</body>
+</html>
